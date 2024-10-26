@@ -1,0 +1,66 @@
+from flask import Flask, request, jsonify
+# predefined sorted list of video titles
+video_titles = [
+    "The Art of Coding",
+    "Exploring the Cosmos",
+    "Cooking Masterclass: Italian Cuisine",
+    "History Uncovered: Ancient Civilizations",
+    "Fitness Fundamentals: Strength Training",
+    "Digital Photography Essentials",
+    "Financial Planning for Beginners",
+    "Nature's Wonders: National Geographic",
+    "Artificial Intelligence Revolution",
+    "Travel Diaries: Discovering Europe"
+]
+app = Flask(__name__)
+# Binary Search Function
+def binary_search(titles, target):
+    """
+    Perform a binary search to find the target in the sorted titles list.
+    Args:
+        titles (list): Sorted list of video titles
+        target (str): Title to search for
+    Returns:
+        int: Index of the found title, or -1 if not found
+    """
+    low, high = 0, len(titles) - 1
+    while low <= high:
+        mid = (low + high)// 2
+        if titles[mid] == target:
+            return mid
+        elif titles[mid] < target:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return -1
+# API Endpoint for searching video titles
+@app.route('/search', methods=['GET'])
+def search_video():
+    """
+    Endpoint to search for a video title in the sorted list.
+    Query Param:
+        title (str): The video title to search for
+    Returns:
+        JSON response with status and the found title (if any)
+    """
+    title = request.args.get('title', '').strip()
+    if not title:
+        return jsonify({"error": "Title query parameter is required"}), 400
+    # Perform binary search
+    index = binary_search(video_titles, title)
+    if index != -1:
+        return jsonify({"status": "found", "title": video_titles[index]}), 200
+    else:
+        return jsonify({"status": "not found", "title": title}), 404
+# Run the Flask app
+if __name__ == '__main__':
+    app.run(debug=True)
+# How to Run the Code:
+  # 1. Install Flask:
+    # pip install Flask
+  # 2. Run the Server:
+    # python video_search_api.py
+  # 3. Test the API:
+        # - Use Postman or a browser to test the endpoint
+        # - for instance, access http://127.0.0.1:5000/search?title=The%20Art%20of%20Coding to check if a video exists.
+        # - For a non-existing title, such as http://127.0.0.1:5000/search?title=Unknown, confirm that it returns a 404 response. (edited) 
